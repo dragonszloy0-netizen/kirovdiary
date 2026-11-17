@@ -1,0 +1,26 @@
+name: Build APK
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unpack project
+        run: |
+          mkdir project
+          unzip -q KirovSchoolMOD3.zip -d project
+          chmod +x project/gradlew
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Build
+        working-directory: project
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KirovSchoolMOD-apk
+          path: project/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
